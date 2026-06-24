@@ -4,6 +4,9 @@ import { authOptions } from "@/lib/auth";
 import { isAdminRole } from "@/lib/auth-roles";
 import AdminShell from "@/components/admin/layout/AdminShell";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
 
