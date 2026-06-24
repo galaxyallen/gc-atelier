@@ -5,7 +5,7 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-function resolveDatabaseUrl(): string | undefined {
+export function resolveDatabaseUrl(): string | undefined {
   return (
     process.env.DATABASE_URL ??
     process.env.POSTGRES_PRISMA_URL ??
@@ -23,7 +23,6 @@ function createPrismaClient() {
     );
   }
 
-  // Strip sslmode/ssl from URL so explicit ssl config below is authoritative.
   let connectionString = rawConnectionString;
   try {
     const url = new URL(rawConnectionString);
@@ -41,11 +40,23 @@ function createPrismaClient() {
   return new PrismaClient({ adapter });
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+function getPrismaClient(): PrismaClient {
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
+  const client = createPrismaClient();
+  if (process.env.NODE_ENV !== "production") {
+    globalForPrisma.prisma = client;
+  }
+  return client;
 }
+
+/** Lazy client — avoids connecting during Next.js build when env is not yet set. */
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    const client = getPrismaClient();
+    const value = Reflect.get(client, prop, receiver);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+});
 
 export function parseJson<T>(value: string | null | undefined, fallback: T): T {
   if (!value) return fallback;

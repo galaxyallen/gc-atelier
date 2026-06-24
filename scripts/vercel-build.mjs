@@ -34,20 +34,17 @@ console.log("Vercel build env check:", envFlags);
 run("npx prisma generate");
 
 const dbUrl = resolveDatabaseUrl();
-if (!dbUrl || !dbUrl.startsWith("postgres")) {
-  console.error(
-    "Build aborted: no Postgres URL found.\n" +
-      "→ Vercel Postgres: Storage → Connect to project\n" +
-      "→ Supabase: add DATABASE_URL in Environment Variables",
+if (dbUrl?.startsWith("postgres")) {
+  try {
+    run("npx prisma migrate deploy", { NODE_TLS_REJECT_UNAUTHORIZED: "0" });
+  } catch {
+    console.warn("prisma migrate deploy failed — continuing build (fix DB URL and redeploy).");
+  }
+} else {
+  console.warn(
+    "No Postgres URL at build time — skipping migrate deploy.\n" +
+      "Add Vercel Postgres or DATABASE_URL, then Redeploy.",
   );
-  process.exit(1);
-}
-
-try {
-  run("npx prisma migrate deploy", { NODE_TLS_REJECT_UNAUTHORIZED: "0" });
-} catch {
-  console.error("prisma migrate deploy failed — check database URL and network.");
-  process.exit(1);
 }
 
 run("npx next build");
