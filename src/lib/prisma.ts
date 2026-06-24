@@ -6,13 +6,33 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
-  const connectionString = process.env.DATABASE_URL;
+  const rawConnectionString =
+    process.env.DATABASE_URL ??
+    process.env.POSTGRES_PRISMA_URL ??
+    process.env.POSTGRES_URL ??
+    process.env.POSTGRES_URL_NON_POOLING;
 
-  if (!connectionString) {
+  if (!rawConnectionString) {
     throw new Error("Database URL is not set. Configure DATABASE_URL.");
   }
 
-  const adapter = new PrismaPg({ connectionString });
+  // Strip any sslmode/ssl params from the URL so our explicit ssl config below
+  // is authoritative. Supabase's pooler uses a self-signed cert in its chain,
+  // and the strict "verify-full" semantics would otherwise reject the connection.
+  let connectionString = rawConnectionString;
+  try {
+    const url = new URL(rawConnectionString);
+    url.searchParams.delete("sslmode");
+    url.searchParams.delete("ssl");
+    connectionString = url.toString();
+  } catch {
+    // If parsing fails, fall back to the raw string.
+  }
+
+  const adapter = new PrismaPg({
+    connectionString,
+    ssl: { rejectUnauthorized: false },
+  });
   return new PrismaClient({ adapter });
 }
 
