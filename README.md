@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GC Atelier
 
-## Getting Started
+Next.js 14 CMS + storefront for [gccreativehk.com](https://gccreativehk.com).
 
-First, run the development server:
+**部署：** Vercel + Supabase（Postgres + Storage）
+
+## 快速开始（本地）
 
 ```bash
+npm install
+cp .env.example .env.local
+# 编辑 .env.local — DATABASE_URL 需为 Supabase Postgres URI（见下方说明）
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+本地开发已默认 `USE_LOCAL_UPLOADS=true`，图片写入 `public/uploads/`。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Vercel 部署（Git 自动部署，推荐）
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+完整步骤见 **[docs/vercel-git-deploy.md](./docs/vercel-git-deploy.md)**。
 
-## Learn More
+简要流程：
 
-To learn more about Next.js, take a look at the following resources:
+1. 将本仓库推送到 GitHub（仓库根目录即 `gc-atelier`，**Root Directory 留空**）
+2. [vercel.com/new](https://vercel.com/new) → Import Git Repository
+3. 按 `env.vercel.example` 在 Vercel 配置 **Production** 环境变量
+4. 推送 `main` 分支 → 自动构建部署
+5. 绑定域名 `gccreativehk.com`，执行一次性 `/api/setup` 初始化数据
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+也可使用 Token CLI 部署：`npm run deploy`（需 `.env.production.local`，见 `.env.production.local.example`）。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 常用命令
 
-## Deploy on Vercel
+| 命令 | 说明 |
+|------|------|
+| `npm run dev` | 本地开发 |
+| `npm run build` | 生产构建 |
+| `npm run db:migrate` | 开发数据库迁移 |
+| `npm run db:deploy` | 生产迁移 |
+| `npm run db:seed` | 种子数据 |
+| `npm run supabase:setup` | 创建 Storage bucket |
+| `npm run migrate:uploads` | 本地图片上传到 Supabase |
+| `npm run deploy:check-env` | 检查 Vercel 环境变量 |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 文档
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [开发手册](./docs/开发手册.md)
+- [运维手册](./docs/运维手册.md)

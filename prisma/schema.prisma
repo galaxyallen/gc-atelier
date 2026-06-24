@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AdminUser {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String
+  password  String
+  role      Role      @default(EDITOR)
+  avatar    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  assignedInquiries Inquiry[]
+}
+
+enum Role {
+  SUPER_ADMIN
+  EDITOR
+  SALES
+}
+
+model Project {
+  id        String          @id @default(cuid())
+  name      String
+  slug      String          @unique
+  category  ProjectCategory
+  year      Int
+  location  String?
+  client    String?
+  scope     String?
+  brief     String?
+  approach  String?
+  image     String?
+  gallery   String          @default("[]")
+  details   String          @default("[]")
+  quote     String?
+  isHero    Boolean         @default(false)
+  status    ContentStatus   @default(DRAFT)
+  sortOrder Int             @default(0)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+enum ProjectCategory {
+  INTERIOR
+  VILLA
+  LANDSCAPE
+  DIFFUSER
+  BACKPACK
+  SPEAKER
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  name        String
+  sku         String          @unique
+  category    ProductCategory
+  price       Int
+  salePrice   Int?
+  description String?
+  images      String          @default("[]")
+  specs       String          @default("[]")
+  stock       Int             @default(0)
+  lowStockAt  Int             @default(10)
+  badge       String?
+  status      ContentStatus   @default(DRAFT)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+}
+
+enum ProductCategory {
+  DIFFUSER
+  BACKPACK
+  SPEAKER
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  orderNumber   String        @unique
+  customer      User          @relation(fields: [customerId], references: [id])
+  customerId    String
+  items         OrderItem[]
+  subtotal      Int
+  shipping      Int           @default(0)
+  total         Int
+  paymentStatus PaymentStatus @default(PENDING)
+  orderStatus   OrderStatus   @default(PENDING)
+  shippingInfo  String?
+  trackingNo    String?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  price     Int
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PRODUCING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String
+  phone     String?
+  company   String?
+  password  String
+  addresses String?
+  tags      String     @default("[]")
+  status    UserStatus @default(ACTIVE)
+  orders    Order[]
+  cart      CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  lastLogin DateTime?
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+model CartItem {
+  id        String  @id @default(cuid())
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int     @default(1)
+}
+
+model Inquiry {
+  id          String        @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  company     String?
+  projectType String?
+  budget      String?
+  message     String
+  status      InquiryStatus @default(NEW)
+  assignedTo  AdminUser?    @relation(fields: [assignedId], references: [id])
+  assignedId  String?
+  notes       String?
+  replies     InquiryReply[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model InquiryReply {
+  id        String   @id @default(cuid())
+  inquiry   Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  inquiryId String
+  from      String
+  subject   String?
+  body      String
+  createdAt DateTime @default(now())
+}
+
+enum InquiryStatus {
+  NEW
+  REPLIED
+  QUOTED
+  CONVERTED
+  CLOSED
+}
+
+model PageContent {
+  id        String   @id @default(cuid())
+  pageKey   String   @unique
+  sections  String
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
