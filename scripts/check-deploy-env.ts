@@ -5,12 +5,18 @@
 import "dotenv/config";
 
 const required = [
-  "DATABASE_URL",
   "NEXTAUTH_SECRET",
   "NEXTAUTH_URL",
   "NEXT_PUBLIC_SITE_URL",
   "NEXT_PUBLIC_SUPABASE_URL",
   "SUPABASE_SERVICE_KEY",
+] as const;
+
+const dbKeys = [
+  "DATABASE_URL",
+  "POSTGRES_PRISMA_URL",
+  "POSTGRES_URL",
+  "POSTGRES_URL_NON_POOLING",
 ] as const;
 
 const recommended = [
@@ -31,6 +37,15 @@ function check(keys: readonly string[], label: string) {
 }
 
 const okRequired = check(required, "Required");
+const hasDb = dbKeys.some((k) => process.env[k]?.trim());
+if (!hasDb) {
+  console.error(
+    "✗ Database URL missing: set DATABASE_URL or Vercel Postgres (POSTGRES_URL / POSTGRES_PRISMA_URL).",
+  );
+  process.exit(1);
+} else {
+  console.log("✓ Database URL: set");
+}
 const okRecommended = check(recommended, "Recommended (Stripe)");
 
 if (!okRequired) {
@@ -42,7 +57,12 @@ if (!okRecommended) {
   console.warn("\nStripe vars missing — shop checkout will not work until configured.");
 }
 
-const dbUrl = process.env.DATABASE_URL ?? "";
+const dbUrl =
+  process.env.DATABASE_URL ??
+  process.env.POSTGRES_PRISMA_URL ??
+  process.env.POSTGRES_URL ??
+  process.env.POSTGRES_URL_NON_POOLING ??
+  "";
 if (!dbUrl.startsWith("postgres://") && !dbUrl.startsWith("postgresql://")) {
   console.error(
     "✗ DATABASE_URL must be a Postgres URL (Supabase). Local file: URLs are not valid for production.",

@@ -31,7 +31,8 @@ const skipKeys = new Set([
 ]);
 
 function run(cmd: string) {
-  console.log(`\n> ${cmd.replace(token, "***")}\n`);
+  const safeCmd = token ? cmd.replace(token, "***") : cmd;
+  console.log(`\n> ${safeCmd}\n`);
   execSync(cmd, { stdio: "inherit", env: process.env });
 }
 

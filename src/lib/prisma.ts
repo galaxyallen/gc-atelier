@@ -5,14 +5,39 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-function createPrismaClient() {
-  const connectionString = process.env.DATABASE_URL;
+function resolveDatabaseUrl(): string | undefined {
+  return (
+    process.env.DATABASE_URL ??
+    process.env.POSTGRES_PRISMA_URL ??
+    process.env.POSTGRES_URL ??
+    process.env.POSTGRES_URL_NON_POOLING
+  );
+}
 
-  if (!connectionString) {
-    throw new Error("Database URL is not set. Configure DATABASE_URL.");
+function createPrismaClient() {
+  const rawConnectionString = resolveDatabaseUrl();
+
+  if (!rawConnectionString) {
+    throw new Error(
+      "Database URL is not set. Configure DATABASE_URL or Vercel Postgres variables.",
+    );
   }
 
-  const adapter = new PrismaPg({ connectionString });
+  // Strip sslmode/ssl from URL so explicit ssl config below is authoritative.
+  let connectionString = rawConnectionString;
+  try {
+    const url = new URL(rawConnectionString);
+    url.searchParams.delete("sslmode");
+    url.searchParams.delete("ssl");
+    connectionString = url.toString();
+  } catch {
+    // If parsing fails, fall back to the raw string.
+  }
+
+  const adapter = new PrismaPg({
+    connectionString,
+    ssl: { rejectUnauthorized: false },
+  });
   return new PrismaClient({ adapter });
 }
 
