@@ -15,6 +15,7 @@
     "migrate:uploads": "npx tsx scripts/migrate-uploads-to-supabase.ts",
     "deploy:check-env": "npx tsx scripts/check-deploy-env.ts",
     "deploy": "npx tsx scripts/deploy-vercel.ts",
+    "build:vercel": "npx tsx scripts/vercel-build.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {
