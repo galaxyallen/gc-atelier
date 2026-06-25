@@ -84,8 +84,29 @@ async function vercelApi(pathname, options = {}) {
   return body;
 }
 
-async function pushEnv(key, value) {
+async function listEnv() {
+  const res = await vercelApi(`/v9/projects/${PROJECT}/env`);
+  return res.envs ?? [];
+}
+
+async function upsertEnv(key, value) {
   console.log(`→ Vercel env: ${key}`);
+  const envs = await listEnv();
+  const existing = envs.find(
+    (e) => e.key === key && e.target?.includes("production"),
+  );
+  if (existing) {
+    await vercelApi(`/v9/projects/${PROJECT}/env/${existing.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        key,
+        value,
+        type: "encrypted",
+        target: ["production"],
+      }),
+    });
+    return;
+  }
   await vercelApi(`/v10/projects/${PROJECT}/env`, {
     method: "POST",
     body: JSON.stringify({
@@ -145,6 +166,16 @@ async function main() {
     process.exit(1);
   }
 
+  if (
+    process.env.DATABASE_URL.includes("[YOUR-PASSWORD]") ||
+    process.env.DATABASE_URL.includes("[password]")
+  ) {
+    console.error(
+      "DATABASE_URL still contains [YOUR-PASSWORD] — replace with your Supabase database password.",
+    );
+    process.exit(1);
+  }
+
   console.log("✓ Local env validation passed\n");
 
   await ensureUploadsBucket();
@@ -152,7 +183,7 @@ async function main() {
   if (TOKEN) {
     const vars = parseEnvFile();
     for (const key of PUSH_KEYS) {
-      if (vars[key]) await pushEnv(key, vars[key]);
+      if (vars[key]) await upsertEnv(key, vars[key]);
     }
     await redeploy();
   } else {

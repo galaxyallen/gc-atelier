@@ -10,7 +10,10 @@ function blobKey(filename: string) {
 export function isRemoteStorageEnabled(): boolean {
   if (process.env.USE_LOCAL_UPLOADS === "true") return false;
   return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY,
+    (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL) &&
+      (process.env.SUPABASE_SERVICE_KEY ||
+        process.env.SUPABASE_SERVICE_ROLE_KEY ||
+        process.env.SUPABASE_SECRET_KEY),
   );
 }
 
