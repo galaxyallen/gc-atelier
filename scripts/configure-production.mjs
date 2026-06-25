@@ -36,12 +36,14 @@ const PUSH_KEYS = [
   "NEXTAUTH_SECRET",
   "NEXTAUTH_URL",
   "NEXT_PUBLIC_SITE_URL",
+  "NEXT_PUBLIC_SITE_MODE",
   "NEXT_PUBLIC_SUPABASE_URL",
   "SUPABASE_SERVICE_KEY",
   "NEXT_PUBLIC_SHOP_CURRENCY",
   "STRIPE_SECRET_KEY",
   "STRIPE_WEBHOOK_SECRET",
   "STRIPE_CURRENCY",
+  "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
 ];
 
 function parseEnvFile() {
@@ -216,7 +218,7 @@ async function main() {
   }
 
   console.log("\nDone. Verify:");
-  console.log("  https://gccreativehk.com/admin/login");
+  console.log("  https://gc-atelier.vercel.app/admin/login");
 }
 
 main().catch((e) => {

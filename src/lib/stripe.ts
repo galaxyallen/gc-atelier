@@ -6,6 +6,11 @@ export function isStripeEnabled() {
   return Boolean(process.env.STRIPE_SECRET_KEY);
 }
 
+export function isStripeTestMode() {
+  const key = process.env.STRIPE_SECRET_KEY ?? "";
+  return key.startsWith("sk_test_");
+}
+
 export function getStripe() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) {

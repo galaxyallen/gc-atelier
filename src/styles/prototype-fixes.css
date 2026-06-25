@@ -291,6 +291,37 @@
   }
 }
 
+/* ── Test mode banner ── */
+.test-mode-banner {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 16px;
+  padding: 8px 16px;
+  background: #3d3520;
+  border-bottom: 1px solid rgba(139, 155, 122, 0.35);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e8dcc8;
+}
+
+.test-mode-banner > span:first-child {
+  color: #c9b896;
+  font-weight: 600;
+}
+
+.test-mode-banner-detail {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: #b8aa94;
+  font-size: 12px;
+}
+
 /* ── Admin: undo global prototype `nav { position: fixed; top: 0 }` ── */
 .admin-shell nav {
   position: static !important;

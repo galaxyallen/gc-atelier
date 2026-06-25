@@ -7,6 +7,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import CartSidebar from "./CartSidebar";
 import LoginModal from "./LoginModal";
+import TestModeBanner from "./TestModeBanner";
 
 function pageClass(pathname: string) {
   if (pathname === "/") return "page-home";
@@ -37,6 +38,7 @@ export default function SiteShell({
 
   return (
     <>
+      <TestModeBanner />
       <Navbar key={navKey} siteName={siteGlobals.siteName} onLoginClick={() => setLoginOpen(true)} />
       <main className={pageClass(pathname)}>{children}</main>
       <Footer siteGlobals={siteGlobals} />
