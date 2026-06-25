@@ -5,8 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { HomeHeroContent } from "@/lib/page-content";
 
 export default function HeroVideo({
-  poster = "/video/hero-poster.jpg",
-  videoSrc = "/video/hero-video.mp4",
+  poster = "/video/hero-poster.svg",
+  videoSrc = "",
   hero,
 }: {
   poster?: string;
@@ -91,18 +91,23 @@ export default function HeroVideo({
 
   return (
     <section className="hero">
-      <video
-        ref={videoRef}
-        className="hero-video"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        poster={poster}
-      >
-        <source src={videoSrc} type="video/mp4" />
-      </video>
+      {videoSrc ? (
+        <video
+          ref={videoRef}
+          className="hero-video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          poster={poster}
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={poster} alt="" className="hero-video hero-poster-fallback" />
+      )}
       <div className="hero-grad" />
       <div className="hero-content">
         <h1 className="hero-tag" ref={tagRef} />

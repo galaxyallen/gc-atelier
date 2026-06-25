@@ -209,28 +209,23 @@ const products = [
 
 export type SeedResult = "seeded" | "skipped";
 
-export async function seedDatabase(force = false): Promise<SeedResult> {
-  const existingAdmin = await prisma.adminUser.findFirst();
-  if (existingAdmin && !force) {
-    return "skipped";
-  }
+async function clearContentData() {
+  await prisma.inquiryReply.deleteMany();
+  await prisma.inquiry.deleteMany();
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.cartItem.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.project.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.pageContent.deleteMany();
+  await prisma.siteSetting.deleteMany();
+}
 
-  if (force) {
-    await prisma.inquiryReply.deleteMany();
-    await prisma.inquiry.deleteMany();
-    await prisma.orderItem.deleteMany();
-    await prisma.order.deleteMany();
-    await prisma.cartItem.deleteMany();
-    await prisma.product.deleteMany();
-    await prisma.project.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.adminUser.deleteMany();
-    await prisma.pageContent.deleteMany();
-    await prisma.siteSetting.deleteMany();
-  }
-
+async function ensureDefaultAdmin() {
+  const existing = await prisma.adminUser.findFirst();
+  if (existing) return;
   const hashedPassword = await bcrypt.hash("admin123", 10);
-
   await prisma.adminUser.create({
     data: {
       email: "admin@gcatelier.com",
@@ -239,7 +234,9 @@ export async function seedDatabase(force = false): Promise<SeedResult> {
       role: "SUPER_ADMIN",
     },
   });
+}
 
+async function insertSeedContent() {
   for (const p of projects) {
     const cat = p.category.toLowerCase();
     await prisma.project.create({
@@ -302,7 +299,7 @@ export async function seedDatabase(force = false): Promise<SeedResult> {
       { key: "shop_page_subtitle", value: "Objects designed and manufactured by GC Atelier." },
       { key: "projects_page_label", value: "Portfolio" },
       { key: "projects_page_title", value: "Projects" },
-      { key: "projects_page_count_text", value: "projects across spaces and objects" },
+      { key: "projects_page_count_text", value: "12 projects across spaces and objects" },
       { key: "contact_email", value: "hello@gcatelier.com" },
       { key: "contact_phone", value: "+86 138 0000 0000" },
       { key: "contact_wechat", value: "gc_atelier" },
@@ -345,6 +342,45 @@ export async function seedDatabase(force = false): Promise<SeedResult> {
       },
     });
   }
+}
+
+/** Seed CMS content (projects, products, pages) without removing existing admins. */
+export async function seedDatabaseContent(force = false): Promise<SeedResult> {
+  const projectCount = await prisma.project.count();
+  if (projectCount >= 12 && !force) return "skipped";
+
+  if (projectCount > 0 || force) {
+    await clearContentData();
+  }
+
+  await ensureDefaultAdmin();
+  await insertSeedContent();
+  return "seeded";
+}
+
+export async function seedDatabase(force = false): Promise<SeedResult> {
+  const existingAdmin = await prisma.adminUser.findFirst();
+  if (existingAdmin && !force) {
+    return "skipped";
+  }
+
+  if (force) {
+    await clearContentData();
+    await prisma.adminUser.deleteMany();
+  }
+
+  const hashedPassword = await bcrypt.hash("admin123", 10);
+
+  await prisma.adminUser.create({
+    data: {
+      email: "admin@gcatelier.com",
+      name: "Admin",
+      password: hashedPassword,
+      role: "SUPER_ADMIN",
+    },
+  });
+
+  await insertSeedContent();
 
   return "seeded";
 }

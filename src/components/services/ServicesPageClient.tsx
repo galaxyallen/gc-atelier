@@ -5,7 +5,22 @@ import { useEffect, useRef, useState } from "react";
 import RevealOnScroll from "@/components/ui/RevealOnScroll";
 import CmsImage from "@/components/ui/CmsImage";
 import { resolveSiteImage } from "@/lib/site-images";
+import { projectImageSrc } from "@/lib/placeholders";
 import type { ServicesContent } from "@/lib/page-content";
+
+const SPATIAL_HERO = "/images/projects/villa.svg";
+const PRODUCT_HERO = "/images/products/diffuser.svg";
+const SPATIAL_PANEL = "/images/projects/interior.svg";
+const PRODUCT_PANEL = "/images/products/speaker.svg";
+
+const MODULE_IMAGES: Record<string, string> = {
+  svcInterior: "/images/projects/interior.svg",
+  svcVilla: "/images/projects/villa.svg",
+  svcLandscape: "/images/projects/landscape.svg",
+  svcDiffuser: "/images/products/diffuser.svg",
+  svcBackpack: "/images/products/backpack.svg",
+  svcSpeaker: "/images/products/speaker.svg",
+};
 
 export default function ServicesPageClient({
   pageImages,
@@ -47,18 +62,26 @@ export default function ServicesPageClient({
     setActivePanel((prev) => (prev === id ? null : id));
   };
 
+  const moduleHeroImage = (svcId: string, featName: string) => {
+    const featured = featImageFor(svcId, featName);
+    if (featured) return featured;
+    return MODULE_IMAGES[svcId] || SPATIAL_HERO;
+  };
+
   return (
     <>
       <section className="hero-split">
         <div className="hero-half">
-          <div className="hero-half-bg" ref={heroLRef}>
-            <span>Spatial design image</span>
+          <div className="hero-half-bg has-image" ref={heroLRef}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={SPATIAL_HERO} alt="" className="cms-img-fill" />
           </div>
         </div>
         <div className="hero-divider" />
         <div className="hero-half">
-          <div className="hero-half-bg" ref={heroRRef}>
-            <span>Product design image</span>
+          <div className="hero-half-bg has-image" ref={heroRRef}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={PRODUCT_HERO} alt="" className="cms-img-fill" />
           </div>
         </div>
         <div className="hero-center">
@@ -87,8 +110,9 @@ export default function ServicesPageClient({
             role="button"
             tabIndex={0}
           >
-            <div className="panel-bg">
-              <span>Spatial design background</span>
+            <div className="panel-bg has-image">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={SPATIAL_PANEL} alt="" className="cms-img-fill" />
             </div>
             <div className="panel-header">
               <div className="panel-title">{content.panels.left.title}</div>
@@ -109,8 +133,9 @@ export default function ServicesPageClient({
             role="button"
             tabIndex={0}
           >
-            <div className="panel-bg">
-              <span>Product design background</span>
+            <div className="panel-bg has-image">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={PRODUCT_PANEL} alt="" className="cms-img-fill" />
             </div>
             <div className="panel-header">
               <div className="panel-title">{content.panels.right.title}</div>
@@ -134,8 +159,13 @@ export default function ServicesPageClient({
         <section key={svc.id} className={`svc-module${alt ? " alt" : ""}`} id={svc.id}>
           <div className="svc-hero">
             {!alt && (
-              <div className="svc-hero-img rv vis">
-                <span>{svc.title} project image</span>
+              <div className="svc-hero-img rv vis has-image">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={moduleHeroImage(svc.id, svc.feat)}
+                  alt={svc.title}
+                  className="cms-img-fill"
+                />
               </div>
             )}
             <div className="svc-hero-text rv vis">
@@ -144,8 +174,13 @@ export default function ServicesPageClient({
               <p className="svc-oneliner">{svc.oneliner}</p>
             </div>
             {alt && (
-              <div className="svc-hero-img rv vis">
-                <span>{svc.title} project image</span>
+              <div className="svc-hero-img rv vis has-image">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={moduleHeroImage(svc.id, svc.feat)}
+                  alt={svc.title}
+                  className="cms-img-fill"
+                />
               </div>
             )}
           </div>

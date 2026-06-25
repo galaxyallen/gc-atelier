@@ -22,7 +22,7 @@ export const SITE_IMAGE_GROUPS: SiteImageGroup[] = [
         key: "hero_poster",
         label: "Hero video poster",
         hint: "Shown before the hero video loads.",
-        defaultValue: "/video/hero-poster.jpg",
+        defaultValue: "/video/hero-poster.svg",
       },
       {
         key: "hero_video",

@@ -15,22 +15,39 @@ const PRODUCT_GRADIENTS: Record<string, string> = {
   SPEAKER: "linear-gradient(160deg, #302a26 0%, #1e1e1c 100%)",
 };
 
+/** True when value looks like a static path or remote URL, not descriptive text. */
+export function isImageUrl(value: string | null | undefined): value is string {
+  const v = value?.trim();
+  if (!v) return false;
+  if (v.startsWith("/") || v.startsWith("http://") || v.startsWith("https://")) return true;
+  return false;
+}
+
+function firstImageUrl(values: string[] | null | undefined): string | null {
+  if (!values?.length) return null;
+  for (const item of values) {
+    if (isImageUrl(item)) return item.trim();
+  }
+  return null;
+}
+
 export function projectImageSrc(image: string | null | undefined, category: string) {
-  if (image) return image;
+  if (isImageUrl(image)) return image.trim();
   const slug = category.toLowerCase();
   return `/images/projects/${slug}.svg`;
 }
 
-/** Cover image for list cards: explicit cover → gallery[0] → category placeholder. */
+/** Cover image for list cards: explicit cover → gallery URL → category placeholder. */
 export function resolveProjectCoverImage(
   image: string | null | undefined,
   galleryJson: string | null | undefined,
   category: string
 ): string {
-  if (image?.trim()) return image.trim();
+  if (isImageUrl(image)) return image.trim();
   try {
     const gallery = galleryJson ? (JSON.parse(galleryJson) as string[]) : [];
-    if (gallery[0]?.trim()) return gallery[0].trim();
+    const fromGallery = firstImageUrl(gallery);
+    if (fromGallery) return fromGallery;
   } catch {
     /* ignore */
   }
@@ -40,7 +57,8 @@ export function resolveProjectCoverImage(
 export function productImageSrc(imagesJson: string | null | undefined, category: string) {
   try {
     const images = imagesJson ? (JSON.parse(imagesJson) as string[]) : [];
-    if (images[0]) return images[0];
+    const fromImages = firstImageUrl(images);
+    if (fromImages) return fromImages;
   } catch {
     /* ignore */
   }

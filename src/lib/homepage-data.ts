@@ -1,4 +1,5 @@
 import type { ContactContent, HomeContent, HomeProductCard, HomeProjectCard } from "@/lib/page-content";
+import { isImageUrl } from "@/lib/placeholders";
 
 export type HomeContactInfo = {
   email: string;
@@ -57,15 +58,22 @@ export function resolveHomeProducts(
 }
 
 export function dbProjectToCard(project: DbProject): HomeProjectCard {
-  const cover = project.image?.trim()
-    || (() => {
-      try {
-        const gallery = project.gallery ? (JSON.parse(project.gallery) as string[]) : [];
-        return gallery[0]?.trim() ?? "";
-      } catch {
-        return "";
+  let cover = "";
+  if (isImageUrl(project.image)) {
+    cover = project.image.trim();
+  } else {
+    try {
+      const gallery = project.gallery ? (JSON.parse(project.gallery) as string[]) : [];
+      for (const item of gallery) {
+        if (isImageUrl(item)) {
+          cover = item.trim();
+          break;
+        }
       }
-    })();
+    } catch {
+      /* ignore */
+    }
+  }
   return {
     name: project.name,
     category: project.category,
@@ -77,7 +85,12 @@ export function dbProductToCard(product: DbProduct): HomeProductCard {
   let image = "";
   try {
     const images = product.images ? (JSON.parse(product.images) as string[]) : [];
-    image = images[0] ?? "";
+    for (const item of images) {
+      if (isImageUrl(item)) {
+        image = item.trim();
+        break;
+      }
+    }
   } catch {
     /* ignore */
   }

@@ -199,6 +199,24 @@
 }
 
 /* ── CMS-managed images across pages ── */
+.hero-half-bg.has-image,
+.panel-bg.has-image {
+  overflow: hidden;
+}
+
+.hero-half-bg.has-image .cms-img-fill,
+.panel-bg.has-image .cms-img-fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-video.hero-poster-fallback {
+  object-fit: cover;
+}
+
 .page-studio .hero-bg.has-image {
   background-size: cover;
   background-position: center;
