@@ -231,7 +231,7 @@ async function main() {
   }
 
   console.log("\nDone. Verify:");
-  console.log("  https://gc-atelier.vercel.app/admin/login");
+  console.log("  https://gccreativehk.com/admin/login");
 }
 
 main().catch((e) => {
