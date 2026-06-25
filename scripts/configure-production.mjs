@@ -24,7 +24,6 @@ const TEAM_SLUG = process.env.VERCEL_TEAM_SLUG?.trim() || "allens-projects-6acbb
 const PROJECT = process.env.VERCEL_PROJECT?.trim() || "gc-atelier";
 
 const REQUIRED = [
-  "DATABASE_URL",
   "NEXTAUTH_SECRET",
   "NEXTAUTH_URL",
   "NEXT_PUBLIC_SITE_URL",
@@ -96,14 +95,13 @@ async function upsertEnv(key, value) {
     (e) => e.key === key && e.target?.includes("production"),
   );
   if (existing) {
+    const body =
+      existing.type === "sensitive"
+        ? { value, target: ["production"] }
+        : { key, value, type: existing.type, target: ["production"] };
     await vercelApi(`/v9/projects/${PROJECT}/env/${existing.id}`, {
       method: "PATCH",
-      body: JSON.stringify({
-        key,
-        value,
-        type: "encrypted",
-        target: ["production"],
-      }),
+      body: JSON.stringify(body),
     });
     return;
   }
@@ -116,6 +114,24 @@ async function upsertEnv(key, value) {
       target: ["production"],
     }),
   });
+}
+
+function isPlaceholderDatabaseUrl(url) {
+  return (
+    !url ||
+    url.includes("[YOUR-PASSWORD]") ||
+    url.includes("[password]")
+  );
+}
+
+async function hasVercelPostgres() {
+  if (!TOKEN) return false;
+  const envs = await listEnv();
+  return envs.some(
+    (e) =>
+      e.target?.includes("production") &&
+      ["POSTGRES_URL", "POSTGRES_PRISMA_URL"].includes(e.key),
+  );
 }
 
 async function redeploy() {
@@ -161,19 +177,26 @@ async function main() {
     process.exit(1);
   }
 
-  if (!process.env.DATABASE_URL.startsWith("postgres")) {
+  const dbUrl = process.env.DATABASE_URL?.trim();
+  const dbPlaceholder = isPlaceholderDatabaseUrl(dbUrl);
+  const vercelHasPostgres = await hasVercelPostgres();
+
+  if (dbUrl && !dbUrl.startsWith("postgres")) {
     console.error("DATABASE_URL must be a postgres:// or postgresql:// URL");
     process.exit(1);
   }
 
-  if (
-    process.env.DATABASE_URL.includes("[YOUR-PASSWORD]") ||
-    process.env.DATABASE_URL.includes("[password]")
-  ) {
+  if (dbPlaceholder && !vercelHasPostgres) {
     console.error(
-      "DATABASE_URL still contains [YOUR-PASSWORD] — replace with your Supabase database password.",
+      "DATABASE_URL still contains [YOUR-PASSWORD] — replace with your Supabase database password, or connect Supabase in Vercel Integrations.",
     );
     process.exit(1);
+  }
+
+  if (dbPlaceholder && vercelHasPostgres) {
+    console.warn(
+      "⚠ DATABASE_URL is a placeholder — skipping push; Vercel POSTGRES_* from Supabase integration will be used.",
+    );
   }
 
   console.log("✓ Local env validation passed\n");
@@ -183,6 +206,7 @@ async function main() {
   if (TOKEN) {
     const vars = parseEnvFile();
     for (const key of PUSH_KEYS) {
+      if (key === "DATABASE_URL" && dbPlaceholder) continue;
       if (vars[key]) await upsertEnv(key, vars[key]);
     }
     await redeploy();
