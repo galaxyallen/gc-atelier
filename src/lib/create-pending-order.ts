@@ -79,39 +79,40 @@ export async function createPendingOrder(
 }
 
 export async function fulfillPaidOrder(orderId: string) {
-  return prisma.$transaction(async (tx) => {
-    const order = await tx.order.findUnique({
-      where: { id: orderId },
-      include: { items: true },
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: { items: true },
+  });
+
+  if (!order) {
+    throw new Error(`Order not found: ${orderId}`);
+  }
+
+  if (order.paymentStatus === "PAID") {
+    return order;
+  }
+
+  for (const item of order.items) {
+    const product = await prisma.product.findUnique({ where: { id: item.productId } });
+    if (!product || product.stock < item.quantity) {
+      throw new Error(`Insufficient stock for product ${item.productId}`);
+    }
+  }
+
+  for (const item of order.items) {
+    await prisma.product.update({
+      where: { id: item.productId },
+      data: { stock: { decrement: item.quantity } },
     });
+  }
 
-    if (!order) {
-      throw new Error(`Order not found: ${orderId}`);
-    }
-
-    if (order.paymentStatus === "PAID") {
-      return order;
-    }
-
-    for (const item of order.items) {
-      const product = await tx.product.findUnique({ where: { id: item.productId } });
-      if (!product || product.stock < item.quantity) {
-        throw new Error(`Insufficient stock for product ${item.productId}`);
-      }
-      await tx.product.update({
-        where: { id: item.productId },
-        data: { stock: { decrement: item.quantity } },
-      });
-    }
-
-    return tx.order.update({
-      where: { id: orderId },
-      data: {
-        paymentStatus: "PAID",
-        orderStatus: "CONFIRMED",
-      },
-      include: { items: { include: { product: true } } },
-    });
+  return prisma.order.update({
+    where: { id: orderId },
+    data: {
+      paymentStatus: "PAID",
+      orderStatus: "CONFIRMED",
+    },
+    include: { items: { include: { product: true } } },
   });
 }
 
