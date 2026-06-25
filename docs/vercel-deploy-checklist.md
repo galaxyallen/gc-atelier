@@ -1,34 +1,56 @@
-# Vercel deploy checklist — open this if build fails
+# Vercel deploy checklist — Supabase
 
-## 1. Database (required for build)
+## 1. Database (Supabase)
 
-**Option A — Vercel Postgres (easiest)**
-1. Vercel project → **Storage** → **Create Database** → Postgres
-2. **Connect** database to this project
-3. Redeploy — auto injects `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING`
+Use the Supabase project that already has tables (`AdminUser`, `Product`, etc.).
 
-**Option B — Supabase**
-Add in Settings → Environment Variables → Production:
-`DATABASE_URL=postgresql://...pooler.supabase.com:6543/postgres?pgbouncer=true`
+**Settings → Database → Connection string → URI → Transaction pooler (6543)** → `DATABASE_URL`
 
-## 2. Required env vars (Production)
+## 2. Storage
 
-```
-NEXTAUTH_SECRET=<random-32+ chars>
-NEXTAUTH_URL=https://gccreativehk.com
-NEXT_PUBLIC_SITE_URL=https://gccreativehk.com
-NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_SERVICE_KEY=<service_role>
-```
+Create bucket **`uploads`** (or run `npm run configure:production` after filling `.env.production.local`).
 
-## 3. Redeploy
+## 3. Vercel env vars (Production)
 
-Deployments → latest → **Redeploy** (use existing Build Cache: No if env just changed)
+| Variable | Source |
+|----------|--------|
+| `DATABASE_URL` | Supabase pooler URI |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase API → Project URL |
+| `SUPABASE_SERVICE_KEY` | Supabase API → service_role |
+| `NEXTAUTH_SECRET` | Random string |
+| `NEXTAUTH_URL` | `https://gc-atelier.vercel.app` |
+| `NEXT_PUBLIC_SITE_URL` | Same as above |
 
-## 4. After success
+## 4. One-command setup (recommended)
+
+1. Copy `.env.production.local.example` → `.env.production.local` (or edit existing)
+2. Fill `VERCEL_TOKEN`, `DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_KEY`
+3. Run:
 
 ```bash
-curl -X POST https://gccreativehk.com/api/setup -H "x-setup-secret: YOUR_SECRET"
+npm run configure:production
 ```
 
-See `env.vercel.example` for Stripe variables.
+This creates the `uploads` bucket, pushes env to Vercel, and triggers redeploy.
+
+## 5. Manual redeploy
+
+**Deployments → Redeploy** (disable Build Cache after env changes).
+
+## 6. Admin login
+
+https://gc-atelier.vercel.app/admin/login
+
+If login fails, run one-time setup:
+
+```bash
+curl -X POST https://gc-atelier.vercel.app/api/setup -H "x-setup-secret: YOUR_SECRET"
+```
+
+(After setting `SETUP_SECRET` on Vercel temporarily.)
+
+Default: `admin@gcatelier.com` / `admin123` — change password after login.
+
+## 7. Stripe (optional)
+
+See `env.vercel.example`.
