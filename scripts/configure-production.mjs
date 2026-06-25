@@ -97,10 +97,23 @@ async function upsertEnv(key, value) {
     (e) => e.key === key && e.target?.includes("production"),
   );
   if (existing) {
-    const body =
-      existing.type === "sensitive"
-        ? { value, target: ["production"] }
-        : { key, value, type: existing.type, target: ["production"] };
+    if (existing.type === "sensitive") {
+      // Sensitive vars cannot be PATCH-updated reliably; recreate as encrypted.
+      await vercelApi(`/v9/projects/${PROJECT}/env/${existing.id}`, {
+        method: "DELETE",
+      });
+      await vercelApi(`/v10/projects/${PROJECT}/env`, {
+        method: "POST",
+        body: JSON.stringify({
+          key,
+          value,
+          type: "encrypted",
+          target: ["production"],
+        }),
+      });
+      return;
+    }
+    const body = { key, value, type: existing.type, target: ["production"] };
     await vercelApi(`/v9/projects/${PROJECT}/env/${existing.id}`, {
       method: "PATCH",
       body: JSON.stringify(body),
