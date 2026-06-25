@@ -18,7 +18,7 @@ Create bucket **`uploads`** (or run `npm run configure:production` after filling
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase API → Project URL |
 | `SUPABASE_SERVICE_KEY` | Supabase API → service_role |
 | `NEXTAUTH_SECRET` | Random string |
-| `NEXTAUTH_URL` | `https://gc-atelier.vercel.app` |
+| `NEXTAUTH_URL` | `https://gccreativehk.com` |
 | `NEXT_PUBLIC_SITE_URL` | Same as above |
 
 ## 4. One-command setup (recommended)
@@ -39,12 +39,12 @@ This creates the `uploads` bucket, pushes env to Vercel, and triggers redeploy.
 
 ## 6. Admin login
 
-https://gc-atelier.vercel.app/admin/login
+https://gccreativehk.com/admin/login
 
 If login fails, run one-time setup:
 
 ```bash
-curl -X POST https://gc-atelier.vercel.app/api/setup -H "x-setup-secret: YOUR_SECRET"
+curl -X POST https://gccreativehk.com/api/setup -H "x-setup-secret: YOUR_SECRET"
 ```
 
 (After setting `SETUP_SECRET` on Vercel temporarily.)
