@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { resolveProjectCoverImage } from "@/lib/placeholders";
 import { categoryLabels } from "@/lib/utils";
 import DeleteButton from "@/components/admin/DeleteButton";
 
@@ -24,6 +25,7 @@ export default async function ProjectsPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-[11px] tracking-widest uppercase text-fg-3 border-b border-border">
+              <th className="px-5 py-3 font-normal w-16">Cover</th>
               <th className="px-5 py-3 font-normal">Name</th>
               <th className="px-5 py-3 font-normal">Category</th>
               <th className="px-5 py-3 font-normal">Year</th>
@@ -34,13 +36,23 @@ export default async function ProjectsPage() {
           <tbody>
             {projects.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-5 py-8 text-center text-fg-3">
+                <td colSpan={6} className="px-5 py-8 text-center text-fg-3">
                   No projects yet.
                 </td>
               </tr>
             ) : (
               projects.map((project) => (
                 <tr key={project.id} className="border-b border-border last:border-0">
+                  <td className="px-5 py-3">
+                    <Link href={`/admin/projects/${project.id}`} className="block w-12 h-12 rounded overflow-hidden border border-border bg-bg-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={resolveProjectCoverImage(project.image, project.gallery, project.category)}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    </Link>
+                  </td>
                   <td className="px-5 py-3">
                     <Link
                       href={`/admin/projects/${project.id}`}

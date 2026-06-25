@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { isBuiltinPlaceholderImage } from "@/lib/placeholders";
 
 const labelClass = "block text-[11px] tracking-widest text-fg-3 uppercase mb-2";
 const inputClass =
@@ -23,7 +24,10 @@ export default function ImageUploadField({
   accept = "image/*",
   onChange,
 }: Props) {
-  const [url, setUrl] = useState(defaultValue);
+  const [url, setUrl] = useState(() => {
+    const v = defaultValue?.trim() ?? "";
+    return isBuiltinPlaceholderImage(v) ? "" : v;
+  });
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);

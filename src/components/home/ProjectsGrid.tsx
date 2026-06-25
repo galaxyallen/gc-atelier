@@ -64,8 +64,10 @@ function ProjectCard({ project, delay }: { project: Project; delay: number }) {
       }}
     >
       <div className="p-img has-image">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={project.name} className="p-img-fill" />
+        <div className="p-img-bg">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={src} alt={project.name} className="p-img-fill" />
+        </div>
       </div>
       <div className="p-info">
         <p className="p-name">{project.name}</p>

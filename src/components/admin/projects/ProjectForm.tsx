@@ -161,6 +161,27 @@ export default function ProjectForm({ initial }: { initial?: ProjectData }) {
         </div>
       </div>
 
+      <section className="rounded-lg border border-sage/30 bg-sage/5 p-5 space-y-4">
+        <div>
+          <h2 className="text-sm font-medium text-fg mb-1">Projects 页列表封面</h2>
+          <p className="text-xs text-fg-3 leading-relaxed">
+            控制前台 <strong className="text-fg-2">/projects</strong> 网格里每张卡片的图片（你截图里的那一块），不是点开后的详情大图。
+          </p>
+        </div>
+        <ImageUploadField
+          name="image"
+          label="列表封面图（推荐）"
+          defaultValue={initial?.image ?? ""}
+          hint="点 Upload image 上传。保存后刷新 Projects 页即可看到。"
+        />
+        <ImageListField
+          name="gallery"
+          label="或：在图集里上传（第一张会当列表封面）"
+          defaultValue={initial?.gallery ?? "[]"}
+          hint="若上面没设封面，会自动用这里第一张真实图片 URL。"
+        />
+      </section>
+
       <div className="grid grid-cols-2 gap-5">
         <div>
           <label className={labelClass}>Location</label>
@@ -196,20 +217,6 @@ export default function ProjectForm({ initial }: { initial?: ProjectData }) {
           className={`${inputClass} resize-y`}
         />
       </div>
-
-      <ImageUploadField
-        name="image"
-        label="列表预览图（Projects 页 & 首页）"
-        defaultValue={initial?.image ?? ""}
-        hint="用于 /projects 列表和首页 Selected projects 卡片。点 Upload image 上传，或留空则自动使用下方 Gallery 第一张。"
-      />
-
-      <ImageListField
-        name="gallery"
-        label="Gallery（详情页图集）"
-        defaultValue={initial?.gallery ?? "[]"}
-        hint="项目详情弹层中的图片。若未设置上方预览图，第一张会自动用作列表预览。"
-      />
 
       <div>
         <label className={labelClass}>Details (JSON array)</label>

@@ -23,16 +23,31 @@ export function isImageUrl(value: string | null | undefined): value is string {
   return false;
 }
 
+/** Built-in category SVGs — not user uploads; should not block gallery cover. */
+export function isBuiltinPlaceholderImage(value: string | null | undefined): boolean {
+  const v = value?.trim();
+  if (!v) return false;
+  return (
+    /^\/images\/projects\/[a-z]+\.svg$/i.test(v) ||
+    /^\/images\/products\/[a-z]+\.svg$/i.test(v)
+  );
+}
+
+/** User upload or external URL suitable for cover / gallery display. */
+export function isRealImageUrl(value: string | null | undefined): boolean {
+  return isImageUrl(value) && !isBuiltinPlaceholderImage(value);
+}
+
 function firstImageUrl(values: string[] | null | undefined): string | null {
   if (!values?.length) return null;
   for (const item of values) {
-    if (isImageUrl(item)) return item.trim();
+    if (isRealImageUrl(item)) return item.trim();
   }
   return null;
 }
 
 export function projectImageSrc(image: string | null | undefined, category: string) {
-  if (isImageUrl(image)) return image.trim();
+  if (isRealImageUrl(image)) return image.trim();
   const slug = category.toLowerCase();
   return `/images/projects/${slug}.svg`;
 }
@@ -43,7 +58,7 @@ export function resolveProjectCoverImage(
   galleryJson: string | null | undefined,
   category: string
 ): string {
-  if (isImageUrl(image)) return image.trim();
+  if (isRealImageUrl(image)) return image.trim();
   try {
     const gallery = galleryJson ? (JSON.parse(galleryJson) as string[]) : [];
     const fromGallery = firstImageUrl(gallery);

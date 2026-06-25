@@ -95,6 +95,39 @@
   grid-column: span 2;
 }
 
+/* Hero cards (2-col span) need explicit sizing so cover images render */
+.page-projects .project-grid > .p-card {
+  min-width: 0;
+}
+
+.page-projects .project-grid > .p-card .p-img {
+  width: 100%;
+}
+
+.page-projects .project-grid > .p-card.hero .p-img {
+  aspect-ratio: 16 / 9;
+}
+
+.page-projects .project-grid > .p-card:not(.hero) .p-img {
+  aspect-ratio: 4 / 3;
+}
+
+.page-projects .p-img .p-img-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.page-projects .p-overlay {
+  z-index: 2;
+}
+
+.page-projects .p-img .p-img-bg .p-img-fill {
+  z-index: 0;
+}
+
 /* ── Shop page product cards ── */
 .page-shop .shop-grid > .prod-card:not(.show) {
   opacity: 0;
