@@ -16,8 +16,7 @@ export default function CartSidebar({ onLoginClick }: { onLoginClick?: () => voi
   const { data: session, status } = useSession();
   const { items, isOpen, toggle, remove, total, clear } = useCartStore();
   const [checkingOut, setCheckingOut] = useState(false);
-  const [checkoutStep, setCheckoutStep] = useState<"cart" | "confirm" | "login" | "done">("cart");
-  const [orderNumber, setOrderNumber] = useState("");
+  const [checkoutStep, setCheckoutStep] = useState<"cart" | "confirm" | "login">("cart");
   const [error, setError] = useState("");
   const [profile, setProfile] = useState<CheckoutProfile | null>(null);
 
@@ -130,17 +129,7 @@ export default function CartSidebar({ onLoginClick }: { onLoginClick?: () => voi
         </div>
 
         <div className="cart-body">
-          {checkoutStep === "done" ? (
-            <div className="cart-empty" style={{ paddingTop: 40 }}>
-              <p style={{ fontFamily: "var(--fd)", fontSize: 20, color: "var(--sage-l)", marginBottom: 8 }}>
-                Thank you!
-              </p>
-              <p style={{ fontSize: 13, color: "var(--fg2)", marginBottom: 16 }}>Order {orderNumber} placed.</p>
-              <button type="button" className="cart-checkout" onClick={handleClose}>
-                Continue shopping
-              </button>
-            </div>
-          ) : checkoutStep === "login" ? (
+          {checkoutStep === "login" ? (
             <div style={{ paddingTop: 16 }}>
               {error && <p style={{ color: "#f87171", fontSize: 13, marginBottom: 12 }}>{error}</p>}
               <p style={{ fontSize: 14, color: "var(--fg2)", marginBottom: 16, lineHeight: 1.6 }}>
