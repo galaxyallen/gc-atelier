@@ -56,6 +56,31 @@ Default: `admin@gcatelier.com` / `admin123` — change password after login.
 
 Use `sk_test_` / `pk_test_` keys. Test card: `4242 4242 4242 4242`. See `env.vercel.example`.
 
+Webhook URL must be **only**:
+
+`https://gccreativehk.com/api/payments/webhook`
+
+Reset from scratch: `npm run stripe:reset`
+
+## 7b. Do NOT deploy to Netlify (conflict)
+
+This project runs on **Vercel + Supabase only**. Netlify is legacy and will conflict:
+
+| | Vercel (`gccreativehk.com`) | Netlify (`gc-atelier-cms.netlify.app`) |
+|--|--|--|
+| DNS | `@` → `76.76.21.21` | Old `www` CNAME (should be removed) |
+| Status | Working | **503 usage exceeded** |
+| Storage / DB | Supabase | Not configured (removed `netlify.toml`, Netlify Blobs) |
+| Stripe webhook | Correct `whsec_` on Vercel | No valid secret → 400/503 |
+
+**If Stripe “still fails”:**
+
+1. Use **https://gccreativehk.com** only — not any `*.netlify.app` URL.
+2. In [Stripe → Webhooks (Test mode)](https://dashboard.stripe.com/test/webhooks), delete endpoints pointing to `netlify.app`.
+3. Keep one endpoint: `https://gccreativehk.com/api/payments/webhook`.
+4. Do not **Resend** old events — place a **new** test order.
+5. In Netlify dashboard: **disable or delete** site `gc-atelier-cms` to avoid accidental deploys.
+
 ## 8. Go live (after DNS + testing)
 
 1. DNS for `gccreativehk.com` → Vercel (see `docs/vercel-git-deploy.md`)

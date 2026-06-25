@@ -238,7 +238,6 @@ async function ensureDefaultAdmin() {
 
 async function insertSeedContent() {
   for (const p of projects) {
-    const cat = p.category.toLowerCase();
     await prisma.project.create({
       data: {
         name: p.name,
@@ -253,7 +252,7 @@ async function insertSeedContent() {
         isHero: p.isHero,
         sortOrder: p.sortOrder,
         status: "PUBLISHED",
-        image: `/images/projects/${cat}.svg`,
+        image: null,
         gallery: JSON.stringify(p.gallery),
         details: JSON.stringify(p.details),
         quote: p.quote ? JSON.stringify(p.quote) : null,

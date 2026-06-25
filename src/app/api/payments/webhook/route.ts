@@ -11,6 +11,15 @@ export async function POST(req: NextRequest) {
   if (!webhookSecret) {
     return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
   }
+  if (!webhookSecret.startsWith("whsec_")) {
+    return NextResponse.json(
+      {
+        error:
+          "STRIPE_WEBHOOK_SECRET must start with whsec_ (from Stripe Webhook signing secret, not sk_test_ API key). Run: npm run sync:stripe-webhook",
+      },
+      { status: 500 },
+    );
+  }
 
   const signature = req.headers.get("stripe-signature");
   if (!signature) {

@@ -47,7 +47,7 @@ function firstImageUrl(values: string[] | null | undefined): string | null {
 }
 
 export function projectImageSrc(image: string | null | undefined, category: string) {
-  if (isRealImageUrl(image)) return image.trim();
+  if (isRealImageUrl(image)) return image!.trim();
   const slug = category.toLowerCase();
   return `/images/projects/${slug}.svg`;
 }
@@ -58,7 +58,7 @@ export function resolveProjectCoverImage(
   galleryJson: string | null | undefined,
   category: string
 ): string {
-  if (isRealImageUrl(image)) return image.trim();
+  if (isRealImageUrl(image)) return image!.trim();
   try {
     const gallery = galleryJson ? (JSON.parse(galleryJson) as string[]) : [];
     const fromGallery = firstImageUrl(gallery);

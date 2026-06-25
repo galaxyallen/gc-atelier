@@ -367,8 +367,8 @@ function ProjectCard({
       }}
     >
       <div
-        className={`p-img has-image${project.isHero ? " is-hero-cover" : ""}`}
-        style={{ backgroundImage: `url(${src})` }}
+        className={`project-list-cover${project.isHero ? " project-list-cover-hero" : ""}`}
+        style={{ backgroundImage: `url("${src.replace(/"/g, "%22")}")` }}
         role="img"
         aria-label={project.name}
       >
