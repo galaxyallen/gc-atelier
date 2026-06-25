@@ -17,6 +17,7 @@
     "configure:production": "node scripts/configure-production.mjs",
     "ensure:admin": "node scripts/ensure-admin.mjs",
     "seed:production": "npx tsx scripts/seed-production.ts",
+    "sync:stripe-webhook": "npx tsx scripts/sync-stripe-webhook.ts",
     "build:vercel": "npx tsx scripts/vercel-build.ts",
     "postinstall": "prisma generate"
   },
