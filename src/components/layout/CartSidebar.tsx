@@ -85,26 +85,11 @@ export default function CartSidebar({ onLoginClick }: { onLoginClick?: () => voi
         throw new Error("Please sign in to checkout.");
       }
 
-      if (paymentRes.status !== 503) {
-        const err = await paymentRes.json();
-        throw new Error(err.error || "Checkout failed");
-      }
-
-      const res = await fetch("/api/orders/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Checkout failed");
-      }
-
-      const result = await res.json();
-      setOrderNumber(result.orderNumber);
-      clear();
-      setCheckoutStep("done");
+      const err = await paymentRes.json().catch(() => ({}));
+      throw new Error(
+        (err as { error?: string }).error ||
+          "Online payment failed. Please try again or contact us.",
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Checkout failed");
     } finally {

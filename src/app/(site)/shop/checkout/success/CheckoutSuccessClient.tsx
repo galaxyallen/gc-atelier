@@ -9,6 +9,7 @@ type SessionResult = {
   orderNumber: string;
   total: number;
   paymentStatus: string;
+  stripePaymentStatus?: string;
 };
 
 export default function CheckoutSuccessPage() {
@@ -47,6 +48,13 @@ export default function CheckoutSuccessPage() {
         </>
       ) : !result ? (
         <p style={{ color: "var(--fg2)" }}>Confirming your payment…</p>
+      ) : result.stripePaymentStatus !== "paid" ? (
+        <>
+          <h1 style={{ fontFamily: "var(--fd)", fontSize: 32, marginBottom: 12 }}>Payment pending</h1>
+          <p style={{ color: "var(--fg2)", marginBottom: 24 }}>
+            Order <strong>{result.orderNumber}</strong> was created but payment is not confirmed yet.
+          </p>
+        </>
       ) : (
         <>
           <h1 style={{ fontFamily: "var(--fd)", fontSize: 32, color: "var(--sage-l)", marginBottom: 12 }}>

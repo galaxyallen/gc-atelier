@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { fulfillPaidOrder } from "@/lib/create-pending-order";
 import { prisma } from "@/lib/prisma";
 import { getStripe, isStripeEnabled } from "@/lib/stripe";
 
@@ -18,6 +19,10 @@ export async function GET(req: NextRequest) {
   const orderId = session.metadata?.orderId;
   if (!orderId) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
+  }
+
+  if (session.payment_status === "paid") {
+    await fulfillPaidOrder(orderId);
   }
 
   const order = await prisma.order.findUnique({
