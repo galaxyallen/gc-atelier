@@ -33,7 +33,16 @@ export async function POST(req: NextRequest) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         if (session.payment_status === "paid" && session.metadata?.orderId) {
-          await fulfillPaidOrder(session.metadata.orderId);
+          try {
+            await fulfillPaidOrder(session.metadata.orderId);
+          } catch (err) {
+            const message = err instanceof Error ? err.message : "Fulfill failed";
+            if (message.includes("Order not found")) {
+              console.warn("Stripe webhook: order not found, acknowledging:", session.metadata.orderId);
+              break;
+            }
+            throw err;
+          }
         }
         break;
       }
