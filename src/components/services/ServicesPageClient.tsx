@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import RevealOnScroll from "@/components/ui/RevealOnScroll";
 import CmsImage from "@/components/ui/CmsImage";
 import { resolveSiteImage } from "@/lib/site-images";
-import { projectImageSrc } from "@/lib/placeholders";
 import type { ServicesContent } from "@/lib/page-content";
 
 const SPATIAL_HERO = "/images/projects/villa.svg";
