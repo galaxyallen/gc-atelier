@@ -366,11 +366,9 @@ function ProjectCard({
         if (ref.current) ref.current.style.transform = "";
       }}
     >
-      <div className="p-img has-image">
-        <div className="p-img-bg">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt={project.name} className="p-img-fill" />
-        </div>
+      <div className={`p-img has-image${project.isHero ? " p-img-hero" : ""}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={project.name} className="p-img-cover" />
         <div className="p-overlay">
           <span className="p-overlay-text">View project →</span>
         </div>

@@ -95,37 +95,40 @@
   grid-column: span 2;
 }
 
-/* Hero cards (2-col span) need explicit sizing so cover images render */
+/* Project list covers: in-flow img (hero cards broke with absolute + flex collapse) */
 .page-projects .project-grid > .p-card {
   min-width: 0;
 }
 
-.page-projects .project-grid > .p-card .p-img {
+.page-projects .p-img.has-image {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg4);
+}
+
+.page-projects .p-img-cover {
+  display: block;
   width: 100%;
+  height: auto;
+  object-fit: cover;
 }
 
-.page-projects .project-grid > .p-card.hero .p-img {
-  aspect-ratio: 16 / 9;
-}
-
-.page-projects .project-grid > .p-card:not(.hero) .p-img {
+.page-projects .p-card:not(.hero) .p-img-cover {
   aspect-ratio: 4 / 3;
 }
 
-.page-projects .p-img .p-img-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+.page-projects .p-card.hero .p-img-cover {
+  aspect-ratio: 16 / 9;
+}
+
+.page-projects .p-card:hover .p-img-cover {
+  transform: scale(1.04);
+  transition: transform 0.7s var(--ease);
 }
 
 .page-projects .p-overlay {
   z-index: 2;
-}
-
-.page-projects .p-img .p-img-bg .p-img-fill {
-  z-index: 0;
 }
 
 /* ── Shop page product cards ── */
