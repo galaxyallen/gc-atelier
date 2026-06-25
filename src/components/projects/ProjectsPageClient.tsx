@@ -366,9 +366,12 @@ function ProjectCard({
         if (ref.current) ref.current.style.transform = "";
       }}
     >
-      <div className={`p-img has-image${project.isHero ? " p-img-hero" : ""}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={project.name} className="p-img-cover" />
+      <div
+        className={`p-img has-image${project.isHero ? " is-hero-cover" : ""}`}
+        style={{ backgroundImage: `url(${src})` }}
+        role="img"
+        aria-label={project.name}
+      >
         <div className="p-overlay">
           <span className="p-overlay-text">View project →</span>
         </div>
