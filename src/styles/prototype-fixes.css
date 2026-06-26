@@ -81,56 +81,158 @@
   animation: hIn 0.8s var(--ease) forwards;
 }
 
-.page-projects .project-grid > .p-card:not(.show) {
-  opacity: 0;
-  transform: translateY(24px) scale(0.97);
+/* ── Pinterest-style masonry (/projects only) ── */
+.page-projects .grid-wrap {
+  max-width: 1680px;
 }
 
-.page-projects .project-grid > .p-card.show {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.page-projects .project-grid > .p-card.hero {
-  grid-column: span 2;
-}
-
-.page-projects .project-grid > .p-card {
-  min-width: 0;
-  align-self: start;
-  width: 100%;
-}
-
-/* Projects list image area — override homepage flex .p-img; match homepage fill pattern */
-.page-projects .p-card .p-img {
+.page-projects .project-masonry {
   display: block !important;
+  column-count: 4;
+  column-gap: 20px;
+}
+
+.page-projects .project-masonry > .pin-card {
+  break-inside: avoid;
+  margin-bottom: 20px;
+  width: 100%;
+  display: inline-block;
+  vertical-align: top;
+  background: var(--bg3);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.55s var(--ease),
+    transform 0.55s var(--ease),
+    box-shadow 0.35s var(--ease);
+}
+
+.page-projects .project-masonry > .pin-card.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-projects .project-masonry > .pin-card:hover {
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.32);
+}
+
+.page-projects .pin-img {
   position: relative;
   overflow: hidden;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  background-color: var(--bg4);
+  background: var(--bg4);
 }
 
-.page-projects .p-card.hero .p-img {
-  aspect-ratio: 16 / 9;
-}
-
-.page-projects .p-card .p-img-bg {
-  position: absolute;
-  inset: 0;
+.page-projects .pin-img img {
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.45s var(--ease);
 }
 
-.page-projects .p-card:hover .p-img-bg {
+.page-projects .pin-card:hover .pin-img img {
   transform: scale(1.04);
 }
 
-.page-projects .p-card .p-overlay {
+.page-projects .pin-aspect-tall .pin-img {
+  aspect-ratio: 2 / 3;
+}
+
+.page-projects .pin-aspect-portrait .pin-img {
+  aspect-ratio: 3 / 4;
+}
+
+.page-projects .pin-aspect-square .pin-img {
+  aspect-ratio: 1 / 1;
+}
+
+.page-projects .pin-aspect-wide .pin-img {
+  aspect-ratio: 4 / 5;
+}
+
+.page-projects .pin-overlay {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity 0.35s var(--ease);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 14px;
+  pointer-events: none;
+}
+
+.page-projects .pin-card:hover .pin-overlay {
+  opacity: 1;
+}
+
+.page-projects .pin-overlay-text {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  font-weight: 500;
+}
+
+.page-projects .pin-info {
+  padding: 12px 14px 14px;
+}
+
+.page-projects .pin-title {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  margin: 0 0 8px;
+  color: var(--fg);
+}
+
+.page-projects .pin-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.page-projects .pin-cat {
+  font-size: 10px;
+  color: var(--sage);
+  letter-spacing: 0.03em;
+  background: var(--sage-dim);
+  border: 1px solid var(--sage-b);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.page-projects .pin-year {
+  font-size: 11px;
+  color: var(--fg3);
+}
+
+@media (max-width: 1200px) {
+  .page-projects .project-masonry {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 960px) {
+  .page-projects .project-masonry {
+    column-count: 2;
+    column-gap: 16px;
+  }
+
+  .page-projects .project-masonry > .pin-card {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-projects .project-masonry {
+    column-count: 1;
+  }
 }
 
 /* ── Shop page product cards ── */

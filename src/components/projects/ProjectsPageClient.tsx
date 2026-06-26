@@ -163,11 +163,12 @@ export default function ProjectsPageClient({
       </div>
 
       <div className="grid-wrap">
-        <div className="project-grid">
-          {displayed.map((p) => (
+        <div className="project-grid project-masonry">
+          {displayed.map((p, i) => (
             <ProjectCard
               key={p.id}
               project={p}
+              index={i}
               visible={shown.has(p.id)}
               onOpen={() => openCase(p.slug)}
             />
@@ -333,57 +334,54 @@ export default function ProjectsPageClient({
   );
 }
 
+function pinAspectClass(slug: string): string {
+  const tiers = ["pin-aspect-tall", "pin-aspect-portrait", "pin-aspect-square", "pin-aspect-wide"];
+  let n = 0;
+  for (let i = 0; i < slug.length; i++) n += slug.charCodeAt(i);
+  return tiers[n % tiers.length];
+}
+
 function ProjectCard({
   project,
+  index,
   visible,
   onOpen,
 }: {
   project: Project;
+  index: number;
   visible: boolean;
   onOpen: () => void;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
   const src = resolveProjectListImage(project.image, project.category);
 
   return (
-    <div
-      ref={ref}
-      className={`p-card${project.isHero ? " hero" : ""}${visible ? " show" : ""}`}
+    <article
+      className={`pin-card ${pinAspectClass(project.slug)}${visible ? " show" : ""}`}
       data-cat={project.category.toLowerCase()}
       onClick={onOpen}
       onKeyDown={(e) => e.key === "Enter" && onOpen()}
       role="button"
       tabIndex={0}
-      onMouseMove={(e) => {
-        const el = ref.current;
-        if (!el) return;
-        const r = el.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width - 0.5;
-        const y = (e.clientY - r.top) / r.height - 0.5;
-        el.style.transform = `perspective(700px) rotateY(${x * 5}deg) rotateX(${-y * 5}deg) scale(1.01)`;
-      }}
-      onMouseLeave={() => {
-        if (ref.current) ref.current.style.transform = "";
-      }}
     >
-      <div className="p-img has-image">
-        <div className="p-img-bg">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt={project.name} className="p-img-fill" />
-        </div>
-        <div className="p-overlay">
-          <span className="p-overlay-text">View project →</span>
-        </div>
-      </div>
-      <div className="p-info">
-        <div>
-          <p className="p-name">{project.name}</p>
-        </div>
-        <div className="p-meta">
-          <span className="p-cat">{categoryLabels[project.category]}</span>
-          <span className="p-year">{project.year}</span>
+      <div className="pin-img">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={project.name}
+          loading={index < 8 ? "eager" : "lazy"}
+          decoding="async"
+        />
+        <div className="pin-overlay">
+          <span className="pin-overlay-text">View project</span>
         </div>
       </div>
-    </div>
+      <div className="pin-info">
+        <h3 className="pin-title">{project.name}</h3>
+        <div className="pin-meta">
+          <span className="pin-cat">{categoryLabels[project.category]}</span>
+          <span className="pin-year">{project.year}</span>
+        </div>
+      </div>
+    </article>
   );
 }
