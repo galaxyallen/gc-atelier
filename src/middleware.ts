@@ -1,5 +1,6 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import { isAdminRole } from "@/lib/auth-roles";
 
 export default withAuth(
   function middleware(req) {
@@ -20,7 +21,9 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         if (req.nextUrl.pathname === "/admin/login") return true;
-        return token?.userType === "admin";
+        if (token?.userType === "admin") return true;
+        // Legacy JWTs before userType was added to the token
+        return isAdminRole(token?.role as string | undefined);
       },
     },
     pages: { signIn: "/admin/login" },

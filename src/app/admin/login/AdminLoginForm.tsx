@@ -8,6 +8,7 @@ export default function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/admin";
+  const sessionError = searchParams.get("error") === "session";
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -49,9 +50,9 @@ export default function AdminLoginForm() {
           onSubmit={handleSubmit}
           className="bg-bg-2 border border-border rounded-xl p-10"
         >
-          {error && (
+          {(error || sessionError) && (
             <p className="text-sm text-red-400 mb-5 bg-red-400/10 px-4 py-3 rounded-md">
-              {error}
+              {error || "Session expired. Please sign in again."}
             </p>
           )}
 

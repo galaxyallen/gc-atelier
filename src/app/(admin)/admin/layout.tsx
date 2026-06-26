@@ -8,7 +8,13 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions);
+  let session = null;
+  try {
+    session = await getServerSession(authOptions);
+  } catch (error) {
+    console.error("Admin session error:", error);
+    redirect("/admin/login?error=session");
+  }
 
   if (!session || !isAdminRole(session.user.role)) {
     redirect("/admin/login?callbackUrl=/admin");
