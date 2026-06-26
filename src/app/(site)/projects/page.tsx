@@ -2,8 +2,8 @@ import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 import { getSiteGlobals } from "@/lib/site-settings.server";
+import { serializeProjectsForClient } from "@/lib/serialize-for-client";
 import ProjectsPageClient from "@/components/projects/ProjectsPageClient";
-
 export const metadata = createMetadata({
   title: "Projects",
   description: "Portfolio of residential and product design projects by GC ATELIER.",
@@ -22,7 +22,7 @@ export default async function ProjectsPage() {
   return (
     <Suspense>
       <ProjectsPageClient
-        projects={projects}
+        projects={serializeProjectsForClient(projects)}
         pageHeader={{
           label: globals.projectsLabel,
           title: globals.projectsTitle,

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 import { getSiteGlobals } from "@/lib/site-settings.server";
+import { serializeProductsForClient } from "@/lib/serialize-for-client";
 import ShopPageClient from "@/components/shop/ShopPageClient";
 
 export const metadata = createMetadata({
@@ -20,7 +21,7 @@ export default async function ShopPage() {
 
   return (
     <ShopPageClient
-      products={products}
+      products={serializeProductsForClient(products)}
       pageHeader={{
         label: globals.shopLabel,
         title: globals.shopTitle,
