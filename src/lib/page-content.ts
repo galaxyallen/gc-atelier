@@ -88,11 +88,25 @@ export type HomeContactContent = {
   heading: string;
   description: string;
   linkText: string;
+  /** @deprecated Legacy overrides — ignored on frontend; edit Contact page instead. */
   email?: string;
   phone?: string;
   wechat?: string;
   address?: string;
 };
+
+/** Homepage contact section text only — contact details live on the Contact page. */
+export function pickHomeContactSection(
+  contact: Partial<HomeContactContent> | undefined
+): HomeContactContent {
+  const c = contact ?? {};
+  return {
+    label: c.label ?? DEFAULT_HOME_CONTENT.contact.label,
+    heading: c.heading ?? DEFAULT_HOME_CONTENT.contact.heading,
+    description: c.description ?? DEFAULT_HOME_CONTENT.contact.description,
+    linkText: c.linkText ?? DEFAULT_HOME_CONTENT.contact.linkText,
+  };
+}
 
 export type HomeContent = {
   hero: HomeHeroContent;
@@ -222,7 +236,7 @@ export function mergeHomeContent(stored: Partial<HomeContent> | null | undefined
         ? s.studio.principles
         : DEFAULT_HOME_CONTENT.studio.principles,
     },
-    contact: { ...DEFAULT_HOME_CONTENT.contact, ...s.contact },
+    contact: pickHomeContactSection({ ...DEFAULT_HOME_CONTENT.contact, ...s.contact }),
   };
 }
 

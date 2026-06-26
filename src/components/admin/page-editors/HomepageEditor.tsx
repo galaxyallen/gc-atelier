@@ -3,12 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Film, Type, FolderKanban, Layers, Package, ListOrdered, Building2, Mail } from "lucide-react";
-import type {
-  ContactContent,
-  HomeContent,
-  HomeProductCard,
-  HomeProjectCard,
-} from "@/lib/page-content";
+import type { HomeContent, HomeProductCard, HomeProjectCard } from "@/lib/page-content";
+import { pickHomeContactSection } from "@/lib/page-content";
 import ContentSection from "@/components/admin/shared/ContentSection";
 import ImageUpload from "@/components/admin/shared/ImageUpload";
 import VideoUpload from "@/components/admin/shared/VideoUpload";
@@ -34,7 +30,12 @@ function padCards<T>(saved: T[] | undefined, fallback: T[], empty: T): T[] {
 type Props = {
   initial: HomeContent;
   images: Record<string, string>;
-  contactPage: ContactContent;
+  contactChannels: {
+    email: string;
+    phone: string;
+    wechat: string;
+    address: string;
+  };
   dbProjectCards: HomeProjectCard[];
   dbProductCards: HomeProductCard[];
 };
@@ -42,7 +43,7 @@ type Props = {
 export default function HomepageEditor({
   initial,
   images: initialImages,
-  contactPage,
+  contactChannels,
   dbProjectCards,
   dbProductCards,
 }: Props) {
@@ -62,15 +63,7 @@ export default function HomepageEditor({
       ...initial.products,
       cards: padCards(initial.products.cards, dbProductCards, EMPTY_PRODUCT),
     },
-    contact: {
-      ...initial.contact,
-      email: initial.contact.email ?? contactPage.channels.email,
-      phone: initial.contact.phone ?? contactPage.channels.phone,
-      wechat: initial.contact.wechat ?? contactPage.channels.wechat,
-      address:
-        initial.contact.address ??
-        contactPage.channels.address.replace(/\n/g, ", "),
-    },
+    contact: pickHomeContactSection(initial.contact),
   }));
 
   const projectCategories = useMemo(() => Object.keys(categoryLabels), []);
@@ -106,20 +99,10 @@ export default function HomepageEditor({
         ...data,
         projects: { ...data.projects, cards: projectCards.length ? projectCards : undefined },
         products: { ...data.products, cards: productCards.length ? productCards : undefined },
+        contact: pickHomeContactSection(data.contact),
       };
 
-      const updatedContact: ContactContent = {
-        ...contactPage,
-        channels: {
-          ...contactPage.channels,
-          email: data.contact.email?.trim() || contactPage.channels.email,
-          phone: data.contact.phone?.trim() || contactPage.channels.phone,
-          wechat: data.contact.wechat?.trim() || contactPage.channels.wechat,
-          address: data.contact.address?.trim() || contactPage.channels.address,
-        },
-      };
-
-      const [contentRes, settingsRes, contactRes] = await Promise.all([
+      const [contentRes, settingsRes] = await Promise.all([
         adminFetch("/api/content/homepage", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -132,13 +115,8 @@ export default function HomepageEditor({
             settings: HOMEPAGE_IMAGE_KEYS.map((key) => ({ key, value: images[key] || "" })),
           }),
         }),
-        adminFetch("/api/content/contact", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sections: updatedContact }),
-        }),
       ]);
-      if (!contentRes.ok || !settingsRes.ok || !contactRes.ok) throw new Error("Save failed");
+      if (!contentRes.ok || !settingsRes.ok) throw new Error("Save failed");
       setMessage("Homepage saved.");
       router.refresh();
     } catch {
@@ -567,24 +545,19 @@ export default function HomepageEditor({
         <Field label="Link text">
           <input className={inputClass} value={data.contact.linkText} onChange={(e) => set("contact", { linkText: e.target.value })} />
         </Field>
-        <div className="grid md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-border">
-          <Field label="Email">
-            <input className={inputClass} value={data.contact.email ?? ""} onChange={(e) => set("contact", { email: e.target.value })} />
-          </Field>
-          <Field label="Phone">
-            <input className={inputClass} value={data.contact.phone ?? ""} onChange={(e) => set("contact", { phone: e.target.value })} />
-          </Field>
-          <Field label="WeChat">
-            <input className={inputClass} value={data.contact.wechat ?? ""} onChange={(e) => set("contact", { wechat: e.target.value })} />
-          </Field>
-          <Field label="Location">
-            <input className={inputClass} value={data.contact.address ?? ""} onChange={(e) => set("contact", { address: e.target.value })} />
-          </Field>
+        <div className="mt-4 pt-4 border-t border-border space-y-2">
+          <p className="text-[11px] tracking-widest text-fg-3 uppercase">Contact details (from Contact page)</p>
+          <div className="grid md:grid-cols-2 gap-3 text-sm text-fg-2">
+            <div><span className="text-fg-3">Email</span><br />{contactChannels.email}</div>
+            <div><span className="text-fg-3">Phone</span><br />{contactChannels.phone}</div>
+            <div><span className="text-fg-3">WeChat</span><br />{contactChannels.wechat}</div>
+            <div><span className="text-fg-3">Location</span><br />{contactChannels.address}</div>
+          </div>
+          <p className="text-xs text-fg-3">
+            邮箱、电话等联系信息请在{" "}
+            <a href="/admin/contact-page" className="text-sage hover:underline">Contact 页面</a> 编辑，首页会自动同步。
+          </p>
         </div>
-        <p className="text-xs text-fg-3 mt-2">
-          联系信息会同步到首页与 Contact 页面。也可在{" "}
-          <a href="/admin/contact-page" className="text-sage hover:underline">Contact 页面</a> 编辑。
-        </p>
       </ContentSection>
     </div>
   );

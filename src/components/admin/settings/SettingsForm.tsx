@@ -22,10 +22,10 @@ const keyLabels: Record<string, string> = {
   projects_page_label: "Projects 页 — 小标题",
   projects_page_title: "Projects 页 — 主标题",
   projects_page_count_text: "Projects 页 — 数量说明（数字自动显示在前）",
-  contact_email: "联系邮箱（备用，首页以 Contact 页面为准）",
-  contact_phone: "联系电话（备用）",
-  contact_wechat: "微信号（备用）",
-  studio_address: "工作室地址（备用）",
+  contact_email: "联系邮箱（已弃用 — 请在 Contact 页面编辑）",
+  contact_phone: "联系电话（已弃用 — 请在 Contact 页面编辑）",
+  contact_wechat: "微信号（已弃用 — 请在 Contact 页面编辑）",
+  studio_address: "工作室地址（已弃用 — 请在 Contact 页面编辑）",
 };
 
 const SECTIONS: { title: string; keys: string[] }[] = [

@@ -8,21 +8,19 @@ export type HomeContactInfo = {
   address: string;
 };
 
-/** Homepage contact: prefer homepage section overrides, then Contact page channels. */
+/** Homepage contact details always come from the Contact page CMS (single source of truth). */
 export function resolveHomeContactInfo(
-  home: HomeContent,
+  _home: HomeContent,
   contactPage: ContactContent
 ): HomeContactInfo {
   const channels = contactPage.channels;
   const address =
-    home.contact.address?.trim() ||
-    channels.address.replace(/\n/g, ", ").trim() ||
-    "Guangzhou, China";
+    channels.address.replace(/\n/g, ", ").trim() || "Guangzhou, China";
 
   return {
-    email: home.contact.email?.trim() || channels.email,
-    phone: home.contact.phone?.trim() || channels.phone,
-    wechat: home.contact.wechat?.trim() || channels.wechat,
+    email: channels.email,
+    phone: channels.phone,
+    wechat: channels.wechat,
     address,
   };
 }

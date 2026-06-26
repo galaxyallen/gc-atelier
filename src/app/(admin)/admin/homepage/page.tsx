@@ -36,7 +36,12 @@ export default async function HomepageAdminPage() {
       <HomepageEditor
         initial={content}
         images={images}
-        contactPage={contactPage}
+        contactChannels={{
+          email: contactPage.channels.email,
+          phone: contactPage.channels.phone,
+          wechat: contactPage.channels.wechat,
+          address: contactPage.channels.address.replace(/\n/g, ", "),
+        }}
         dbProjectCards={dbProjects.map(dbProjectToCard)}
         dbProductCards={dbProducts.map(dbProductToCard)}
       />
