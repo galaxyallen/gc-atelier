@@ -9,10 +9,17 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url:
-      process.env["DATABASE_URL"] ??
-      process.env["POSTGRES_URL_NON_POOLING"] ??
-      process.env["POSTGRES_URL"] ??
-      process.env["POSTGRES_PRISMA_URL"],
+    url: (() => {
+      const candidates = [
+        process.env["DATABASE_URL"],
+        process.env["POSTGRES_URL_NON_POOLING"],
+        process.env["POSTGRES_URL"],
+        process.env["POSTGRES_PRISMA_URL"],
+      ];
+      for (const url of candidates) {
+        if (url?.startsWith("postgres://") || url?.startsWith("postgresql://")) return url;
+      }
+      return process.env["DATABASE_URL"];
+    })(),
   },
 });

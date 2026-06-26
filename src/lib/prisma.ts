@@ -5,13 +5,22 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
+function isPostgresUrl(value: string | undefined): value is string {
+  if (!value) return false;
+  return value.startsWith("postgres://") || value.startsWith("postgresql://");
+}
+
 export function resolveDatabaseUrl(): string | undefined {
-  return (
-    process.env.DATABASE_URL ??
-    process.env.POSTGRES_PRISMA_URL ??
-    process.env.POSTGRES_URL_NON_POOLING ??
-    process.env.POSTGRES_URL
-  );
+  const candidates = [
+    process.env.DATABASE_URL,
+    process.env.POSTGRES_PRISMA_URL,
+    process.env.POSTGRES_URL_NON_POOLING,
+    process.env.POSTGRES_URL,
+  ];
+  for (const url of candidates) {
+    if (isPostgresUrl(url)) return url;
+  }
+  return undefined;
 }
 
 function createPrismaClient() {
