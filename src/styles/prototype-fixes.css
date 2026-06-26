@@ -97,26 +97,39 @@
 
 .page-projects .project-grid > .p-card {
   min-width: 0;
+  align-self: start;
+  width: 100%;
 }
 
-/* Project list covers — isolated from legacy .p-img rules */
-.page-projects .project-list-cover {
+/* Projects list image area — override homepage flex .p-img; match homepage fill pattern */
+.page-projects .p-card .p-img {
   display: block !important;
   position: relative;
   overflow: hidden;
   width: 100%;
   aspect-ratio: 4 / 3;
   background-color: var(--bg4);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
-.page-projects .project-list-cover-hero {
+.page-projects .p-card.hero .p-img {
   aspect-ratio: 16 / 9;
 }
 
-.page-projects .project-list-cover .p-overlay {
+.page-projects .p-card .p-img-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.page-projects .p-card:hover .p-img-bg {
+  transform: scale(1.04);
+}
+
+.page-projects .p-card .p-overlay {
+  position: absolute;
+  inset: 0;
   z-index: 2;
 }
 

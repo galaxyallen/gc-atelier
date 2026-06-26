@@ -52,11 +52,35 @@ export function projectImageSrc(image: string | null | undefined, category: stri
   return `/images/projects/${slug}.svg`;
 }
 
-/** Cover image for list cards: explicit cover → gallery URL → category placeholder. */
+/** List/grid thumbnail only (Projects page, homepage cards). Does not use gallery. */
+export function resolveProjectListImage(
+  image: string | null | undefined,
+  category: string,
+): string {
+  if (isRealImageUrl(image)) return image!.trim();
+  return projectImageSrc(null, category);
+}
+
+/** Detail overlay / project page hero — gallery first, not list preview. */
+export function resolveProjectDetailHero(
+  galleryJson: string | null | undefined,
+  category: string,
+): string {
+  try {
+    const gallery = galleryJson ? (JSON.parse(galleryJson) as string[]) : [];
+    const fromGallery = firstImageUrl(gallery);
+    if (fromGallery) return fromGallery;
+  } catch {
+    /* ignore */
+  }
+  return projectImageSrc(null, category);
+}
+
+/** @deprecated Use resolveProjectListImage or resolveProjectDetailHero */
 export function resolveProjectCoverImage(
   image: string | null | undefined,
   galleryJson: string | null | undefined,
-  category: string
+  category: string,
 ): string {
   if (isRealImageUrl(image)) return image!.trim();
   try {

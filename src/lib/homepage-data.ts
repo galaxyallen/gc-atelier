@@ -58,22 +58,7 @@ export function resolveHomeProducts(
 }
 
 export function dbProjectToCard(project: DbProject): HomeProjectCard {
-  let cover = "";
-  if (isImageUrl(project.image)) {
-    cover = project.image.trim();
-  } else {
-    try {
-      const gallery = project.gallery ? (JSON.parse(project.gallery) as string[]) : [];
-      for (const item of gallery) {
-        if (isImageUrl(item)) {
-          cover = item.trim();
-          break;
-        }
-      }
-    } catch {
-      /* ignore */
-    }
-  }
+  const cover = isImageUrl(project.image) ? project.image!.trim() : "";
   return {
     name: project.name,
     category: project.category,

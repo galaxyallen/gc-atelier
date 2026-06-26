@@ -1,6 +1,6 @@
 import { prisma, parseJson } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { resolveProjectCoverImage } from "@/lib/placeholders";
+import { resolveProjectDetailHero, resolveProjectListImage } from "@/lib/placeholders";
 import CmsImage from "@/components/ui/CmsImage";
 import { categoryLabels } from "@/lib/utils";
 import RevealOnScroll from "@/components/ui/RevealOnScroll";
@@ -24,7 +24,7 @@ export default async function CaseStudyPage({ params }: { params: { slug: string
 
   if (!project) notFound();
 
-  const heroSrc = resolveProjectCoverImage(project.image, project.gallery, project.category);
+  const heroSrc = resolveProjectDetailHero(project.gallery, project.category);
   const gallery = parseJson<string[]>(project.gallery, []);
   const galleryUrls = gallery.filter((u) => u.startsWith("/") || u.startsWith("http"));
   const details = parseJson<Detail[]>(project.details, []);
@@ -128,7 +128,7 @@ export default async function CaseStudyPage({ params }: { params: { slug: string
               <Link key={r.id} href={`/projects/${r.slug}`} className="bg-bg-3 rounded overflow-hidden hover:-translate-y-1 transition-transform">
                 <div className={`aspect-[4/3] bg-bg-4 flex items-center justify-center relative overflow-hidden has-image`}>
                   <CmsImage
-                    src={resolveProjectCoverImage(r.image, r.gallery, r.category)}
+                    src={resolveProjectListImage(r.image, r.category)}
                     alt={r.name}
                     placeholder="Project"
                   />

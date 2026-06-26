@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { resolveProjectCoverImage } from "@/lib/placeholders";
+import { resolveProjectListImage } from "@/lib/placeholders";
 import { categoryLabels } from "@/lib/utils";
 import DeleteButton from "@/components/admin/DeleteButton";
 
@@ -47,7 +47,7 @@ export default async function ProjectsPage() {
                     <Link href={`/admin/projects/${project.id}`} className="block w-12 h-12 rounded overflow-hidden border border-border bg-bg-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={resolveProjectCoverImage(project.image, project.gallery, project.category)}
+                        src={resolveProjectListImage(project.image, project.category)}
                         alt=""
                         className="w-full h-full object-cover"
                       />

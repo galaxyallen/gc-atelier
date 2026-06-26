@@ -163,22 +163,32 @@ export default function ProjectForm({ initial }: { initial?: ProjectData }) {
 
       <section className="rounded-lg border border-sage/30 bg-sage/5 p-5 space-y-4">
         <div>
-          <h2 className="text-sm font-medium text-fg mb-1">Projects 页列表封面</h2>
+          <h2 className="text-sm font-medium text-fg mb-1">列表预览图</h2>
           <p className="text-xs text-fg-3 leading-relaxed">
-            控制前台 <strong className="text-fg-2">/projects</strong> 网格里每张卡片的图片（你截图里的那一块），不是点开后的详情大图。
+            仅用于 <strong className="text-fg-2">/projects</strong> 网格与首页项目卡片。与详情页图集独立，不会互相替换。
           </p>
         </div>
         <ImageUploadField
           name="image"
-          label="列表封面图（推荐）"
+          label="列表预览图"
           defaultValue={initial?.image ?? ""}
-          hint="点 Upload image 上传。保存后刷新 Projects 页即可看到。"
+          hint="上传后保存；未设置时列表显示分类占位图。"
         />
+      </section>
+
+      <section className="rounded-lg border border-border p-5 space-y-4">
+        <div>
+          <h2 className="text-sm font-medium text-fg mb-1">详情页封面与图集</h2>
+          <p className="text-xs text-fg-3 leading-relaxed">
+            点开项目后的顶部大图与相册。第一张为详情封面，其余为图集；<strong className="text-fg-2">不会</strong>用作列表预览。
+          </p>
+        </div>
         <ImageListField
           name="gallery"
-          label="或：在图集里上传（第一张会当列表封面）"
+          label="详情图集"
           defaultValue={initial?.gallery ?? "[]"}
-          hint="若上面没设封面，会自动用这里第一张真实图片 URL。"
+          firstBadgeLabel="详情封面"
+          footerHint="第一张用于详情页顶部封面；列表预览请在上方单独上传。"
         />
       </section>
 

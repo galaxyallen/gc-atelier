@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { normalizeProjectCoverImage } from "@/lib/project-images";
+import { normalizeListPreviewImage } from "@/lib/project-images";
 import { revalidateSitePages } from "@/lib/revalidate-site";
 
 type RouteParams = { params: { id: string } };
@@ -28,7 +28,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
   }
 
   const body = await request.json();
-  const image = normalizeProjectCoverImage(body.image, body.gallery ?? "[]");
+  const image = normalizeListPreviewImage(body.image);
 
   const project = await prisma.project.update({
     where: { id: params.id },

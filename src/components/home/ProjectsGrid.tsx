@@ -3,7 +3,7 @@
 import type { HomeSectionHead } from "@/lib/page-content";
 import Link from "next/link";
 import { useReveal } from "@/components/ui/RevealOnScroll";
-import { homeProjectCategoryLabel, resolveProjectCoverImage } from "@/lib/placeholders";
+import { homeProjectCategoryLabel, resolveProjectListImage } from "@/lib/placeholders";
 
 interface Project {
   slug: string;
@@ -44,7 +44,7 @@ export default function ProjectsGrid({
 
 function ProjectCard({ project, delay }: { project: Project; delay: number }) {
   const ref = useReveal<HTMLAnchorElement>(delay);
-  const src = resolveProjectCoverImage(project.image, project.gallery, project.category);
+  const src = resolveProjectListImage(project.image, project.category);
 
   return (
     <Link

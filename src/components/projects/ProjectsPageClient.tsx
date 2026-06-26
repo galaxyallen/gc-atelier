@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Lightbox from "@/components/ui/Lightbox";
 import CmsImage from "@/components/ui/CmsImage";
 import { categoryLabels } from "@/lib/utils";
-import { resolveProjectCoverImage } from "@/lib/placeholders";
+import { resolveProjectDetailHero, resolveProjectListImage } from "@/lib/placeholders";
 
 interface ProjectDetail {
   icon: string;
@@ -111,7 +111,7 @@ export default function ProjectsPageClient({
 
   const gallery = active ? parseJson<string[]>(active.gallery, []) : [];
   const galleryUrls = gallery.filter((u) => u.startsWith("/") || u.startsWith("http"));
-  const heroSrc = active ? resolveProjectCoverImage(active.image, active.gallery, active.category) : "";
+  const heroSrc = active ? resolveProjectDetailHero(active.gallery, active.category) : "";
   const details = active ? parseJson<ProjectDetail[]>(active.details, []) : [];
   const related = active
     ? projects.filter((p) => p.slug !== active.slug && p.category === active.category).slice(0, 3)
@@ -304,7 +304,7 @@ export default function ProjectsPageClient({
                     <div key={r.id} className="cs-rel-card" onClick={() => openCase(r.slug)} role="button" tabIndex={0}>
                     <div className={`cs-rel-img${r.image ? " has-image" : ""}`} style={!r.image ? { background: "var(--bg4)" } : undefined}>
                       <CmsImage
-                        src={resolveProjectCoverImage(r.image, r.gallery, r.category)}
+                        src={resolveProjectListImage(r.image, r.category)}
                         alt={r.name}
                         placeholder="Project"
                       />
@@ -343,7 +343,7 @@ function ProjectCard({
   onOpen: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const src = resolveProjectCoverImage(project.image, project.gallery, project.category);
+  const src = resolveProjectListImage(project.image, project.category);
 
   return (
     <div
@@ -366,12 +366,11 @@ function ProjectCard({
         if (ref.current) ref.current.style.transform = "";
       }}
     >
-      <div
-        className={`project-list-cover${project.isHero ? " project-list-cover-hero" : ""}`}
-        style={{ backgroundImage: `url("${src.replace(/"/g, "%22")}")` }}
-        role="img"
-        aria-label={project.name}
-      >
+      <div className="p-img has-image">
+        <div className="p-img-bg">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={src} alt={project.name} className="p-img-fill" />
+        </div>
         <div className="p-overlay">
           <span className="p-overlay-text">View project →</span>
         </div>

@@ -18,9 +18,18 @@ type Props = {
   label: string;
   defaultValue?: string;
   hint?: string;
+  firstBadgeLabel?: string;
+  footerHint?: string;
 };
 
-export default function ImageListField({ name, label, defaultValue = "[]", hint }: Props) {
+export default function ImageListField({
+  name,
+  label,
+  defaultValue = "[]",
+  hint,
+  firstBadgeLabel = "详情封面",
+  footerHint = "第一张用于详情页顶部封面。",
+}: Props) {
   const [urls, setUrls] = useState<string[]>(() => parseImages(defaultValue));
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -107,9 +116,9 @@ export default function ImageListField({ name, label, defaultValue = "[]", hint 
                   →
                 </button>
               </div>
-              {i === 0 && (
+              {i === 0 && firstBadgeLabel && (
                 <span className="absolute top-1 left-1 text-[9px] bg-sage text-bg px-1 rounded">
-                  Cover
+                  {firstBadgeLabel}
                 </span>
               )}
             </div>
@@ -141,7 +150,7 @@ export default function ImageListField({ name, label, defaultValue = "[]", hint 
       </button>
 
       {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
-      <p className="text-[10px] text-fg-3 mt-2">第一张图会用作 Projects 列表预览（若未单独设置 Cover image）。</p>
+      {footerHint && <p className="text-[10px] text-fg-3 mt-2">{footerHint}</p>}
     </div>
   );
 }
